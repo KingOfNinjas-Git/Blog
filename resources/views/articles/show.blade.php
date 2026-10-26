@@ -13,18 +13,17 @@
         </p>
     </div>
 
+    @if ($article->image)
+        <div class="mb-6">
+            <img src="{{ asset('storage/' . $article->image) }}" alt="{{ $article->title }}" class="w-full rounded-lg shadow-md">
+        </div>
+    @endif
+
     <div class="mb-6">
-        <h2 class="text-xl font-semibold text-gray-800 mb-2 silkscreen-bold">Content</h2>
         <div class="text-gray-700 leading-relaxed silkscreen-regular">
             {!! nl2br(e($article->content)) !!}
         </div>
     </div>
-
-    @if ($article->image)
-        <div class="mb-4">
-            <img src="{{ asset('storage/' . $article->image) }}" alt="Article Image" class="rounded-lg shadow-md">
-        </div>
-    @endif
 
    <!-- Comments Section -->
     <div class="mt-12">

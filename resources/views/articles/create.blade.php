@@ -22,19 +22,19 @@
         <!-- Title -->
         <div>
             <label class="block text-sm font-medium text-gray-700">Title</label>
-            <input type="text" name="title" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
+            <input type="text" name="title" class="mt-1 block w-full rounded-lg border border-gray-300 p-3 shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
         </div>
     
         <!-- Content -->
         <div>
             <label class="block text-sm font-medium text-gray-700">Content</label>
-            <textarea name="content" rows="5" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500" required></textarea>
+            <textarea name="content" rows="5" class="mt-1 block w-full rounded-lg border border-gray-300 p-3 shadow-sm focus:ring-blue-500 focus:border-blue-500" required></textarea>
         </div>
     
         <!-- Category -->
         <div>
             <label class="block text-sm font-medium text-gray-700">Category</label>
-            <select name="category_id" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
+            <select name="category_id" class="mt-1 block w-full rounded-lg border border-gray-300 p-3 shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
                 <option value="">Select a category</option>
                 @foreach ($categories as $category)
                     <option value="{{ $category->id }}">{{ $category->name }}</option>
@@ -46,7 +46,7 @@
         <div>
             <label class="block text-sm font-medium text-gray-700">Image</label>
             <input type="file" name="image" accept="image/*"
-                class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                class="mt-1 block w-full rounded-lg border border-gray-300 p-3 shadow-sm focus:ring-blue-500 focus:border-blue-500">
         </div>
     
         <!-- Submit Button -->

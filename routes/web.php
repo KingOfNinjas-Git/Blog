@@ -8,10 +8,6 @@ use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\CategoryController;
 
 
-Route::get('/', function () {
-    return view('index');
-});
-
 Route::get('/dashboard', function () {
     return redirect('/');
 })->middleware(['auth', 'verified'])->name('dashboard');
@@ -34,13 +30,17 @@ Route::get('/articles/create', [ArticleController::class, 'create'])->name('arti
 Route::post('/articles', [ArticleController::class, 'store'])->name('articles.store');
 
 // Route for viewing a specific category
-Route::get('/categories/{id}', [CategoryController::class, 'show']);
+Route::get('/categories/{id}', fn ($id) => redirect()->route('articles.index', ['category' => $id]));
 
 // Route for viewing a specific author
-Route::get('/authors/{id}', [AuthorController::class, 'show']);
+Route::get('/authors/{id}', function ($id) {
+    $author = \App\Models\Author::findOrFail($id);
+
+    return redirect()->route('articles.index', ['search' => '@' . $author->name]);
+});
 
 // Frontend routes
-Route::get('/', [FrontendController::class, 'index']);
+Route::get('/', [ArticleController::class, 'index']);
 Route::get('/articles/{id}', [FrontendController::class, 'show']);
 
 Route::resource('articles', ArticleController::class);
