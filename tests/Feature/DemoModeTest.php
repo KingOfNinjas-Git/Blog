@@ -9,11 +9,21 @@ use App\Support\DemoMode;
 use Database\Seeders\BlogContentSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class DemoModeTest extends TestCase
 {
     use RefreshDatabase;
+
+    // The demo clean-up deletes files from the "public" disk, so every test here works on a fake one:
+    // it must never touch the real pictures in storage/app/public.
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        Storage::fake('public');
+    }
 
     public function test_the_starting_content_seeds_from_scratch(): void
     {
