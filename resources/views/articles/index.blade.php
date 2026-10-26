@@ -7,12 +7,12 @@
         <nav class="bg-gradient-to-r from-blue-500 to-cyan-500 text-white py-4 shadow-lg  ">
             <div class="container mx-auto flex space-x-4 overflow-x-auto justify-center items-center pixelify-sans-category">
                 <a href="{{ route('articles.index') }}" 
-                   class="px-6 py-2 rounded-full bg-white text-blue-500 font-semibold shadow-md hover:bg-blue-600 hover:text-white transition-all duration-300">
+                   class="px-6 py-2 rounded-full bg-white text-blue-700 font-semibold shadow-md hover:bg-blue-600 hover:text-white transition-all duration-300">
                     ALL CATEGORIES
                 </a>
                 @foreach ($categories as $category)
                     <a href="{{ route('articles.index', ['category' => $category->id]) }}" 
-                       class="px-6 py-2 rounded-full bg-white text-blue-500 font-semibold shadow-md hover:bg-blue-600 hover:text-white transition-all duration-300">
+                       class="px-6 py-2 rounded-full bg-white text-blue-700 font-semibold shadow-md hover:bg-blue-600 hover:text-white transition-all duration-300">
                         {{ $category->name }}
                     </a>
                 @endforeach
@@ -31,23 +31,23 @@
                             @if (Auth::check())
                                 <span class="text-[#0486A2]">Welcome, <strong>{{ Auth::user()->name }}</strong>!</span>
                                 <a href="{{ route('articles.create') }}"
-                                    class="bg-[#048BA6] text-white px-4 py-2 rounded-lg shadow hover:bg-[#0491AA] transition">
+                                    class="bg-[#037A91] text-white px-4 py-2 rounded-lg shadow hover:bg-[#0491AA] transition">
                                     New Article
                                 </a>
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
                                     <button type="submit"
-                                        class="bg-[#0396AE] text-white px-4 py-2 rounded-lg shadow hover:bg-[#04809D] transition">
+                                        class="bg-[#036E86] text-white px-4 py-2 rounded-lg shadow hover:bg-[#04809D] transition">
                                         Logout
                                     </button>
                                 </form>
                             @else
                                 <a href="{{ route('login') }}"
-                                    class="bg-[#048BA6] text-white px-4 py-2 rounded-lg shadow hover:bg-[#0491AA] transition">
+                                    class="bg-[#037A91] text-white px-4 py-2 rounded-lg shadow hover:bg-[#0491AA] transition">
                                     Login
                                 </a>
                                 <a href="{{ route('register') }}"
-                                    class="bg-[#0396AE] text-white px-4 py-2 rounded-lg shadow hover:bg-[#04809D] transition">
+                                    class="bg-[#036E86] text-white px-4 py-2 rounded-lg shadow hover:bg-[#04809D] transition">
                                     Create Account
                                 </a>
                             @endif
@@ -63,7 +63,7 @@
                         </div>
                         <div>
                             <button type="submit"
-                                class="bg-blue-500 text-white font-semibold py-3 px-6 rounded-lg shadow hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition">
+                                class="bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg shadow hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition">
                                 Filter
                             </button>
                         </div>
@@ -76,6 +76,7 @@
                                 <div class="flex flex-col space-y-4">
                                     @if (!empty($article->image))
                                         <img src="{{ asset('storage/' . $article->image) }}" alt="{{ $article->title }}"
+                                            width="1000" height="600" decoding="async" @if($loop->index >= 2) loading="lazy" @endif
                                             class="w-full h-80 object-cover rounded-lg">
                                     @endif
 
@@ -100,7 +101,7 @@
                                         <div class="flex items-center space-x-4">
                                             <form method="POST" action="{{ route('articles.like', $article->id) }}">
                                                 @csrf
-                                                <button type="submit" class="text-blue-500 hover:text-blue-600 transition text-sm">
+                                                <button type="submit" class="text-blue-700 hover:text-blue-600 transition text-sm">
                                                     👍 Like
                                                 </button>
                                             </form>
@@ -108,7 +109,7 @@
                                             <p class="text-sm text-gray-600">
                                                 {{ $article->comments->count() }} 💬
                                             </p>
-                                            <p class="text-sm text-gray-500">
+                                            <p class="text-sm text-gray-600">
                                                 {{ $article->created_at->diffForHumans() }}
                                             </p>
                                         </div>
@@ -161,7 +162,7 @@
                                 @if (!empty($latestPost->image))
                                 <img src="{{ asset('storage/' . $latestPost->image) }}" 
                                      alt="{{ $latestPost->title }}" 
-                                     class="w-45 h-32 object-cover rounded-lg mt-4">
+                                     width="180" height="128" loading="lazy" decoding="async" class="w-45 h-32 object-cover rounded-lg mt-4">
                                 @endif
                             </div>
                         @else
@@ -185,7 +186,7 @@
                                 @if (!empty($trendingPost->image))
                                 <img src="{{ asset('storage/' . $trendingPost->image) }}" 
                                      alt="{{ $trendingPost->title }}" 
-                                     class="w-45 h-32 object-cover rounded-lg mt-4">
+                                     width="180" height="128" loading="lazy" decoding="async" class="w-45 h-32 object-cover rounded-lg mt-4">
                                 @endif
                                 <p class="text-sm text-gray-200 mt-2">
                                     {{ $trendingPost->reactions->count() }} Likes

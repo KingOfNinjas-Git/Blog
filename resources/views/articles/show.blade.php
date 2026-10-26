@@ -15,7 +15,8 @@
 
     @if ($article->image)
         <div class="mb-6">
-            <img src="{{ asset('storage/' . $article->image) }}" alt="{{ $article->title }}" class="w-full rounded-lg shadow-md">
+            @php($size = $article->imageSize())
+            <img src="{{ asset('storage/' . $article->image) }}" alt="{{ $article->title }}" fetchpriority="high" decoding="async" @if($size) width="{{ $size[0] }}" height="{{ $size[1] }}" @endif class="w-full h-auto rounded-lg shadow-md">
         </div>
     @endif
 
@@ -34,7 +35,7 @@
             <div class="mb-6 p-6 bg-white border border-gray-200 rounded-lg shadow-md">
                 <div class="flex items-center mb-4">
                     <div class="text-blue-600 font-semibold silkscreen-regular text-lg">{{ $comment->user->name }}</div>
-                    <div class="ml-auto text-sm text-gray-500">{{ $comment->created_at->diffForHumans() }}</div>
+                    <div class="ml-auto text-sm text-gray-600">{{ $comment->created_at->diffForHumans() }}</div>
                 </div>
                 <p class="text-gray-700 silkscreen-regular text-left leading-relaxed">{{ $comment->content }}</p>
             </div>
@@ -61,13 +62,13 @@
             </form>
         @else
             <p class="text-gray-600 text-center mt-6 text-lg">
-                You must <a href="{{ route('login') }}" class="text-blue-500 hover:underline">log in</a> to leave a comment.
+                You must <a href="{{ route('login') }}" class="text-blue-700 hover:underline">log in</a> to leave a comment.
             </p>
         @endauth
     </div>
 
     <div class="mt-8">
-        <a href="{{ url('/articles') }}" class="text-blue-500 hover:underline text-lg">&larr; Back to articles</a>
+        <a href="{{ url('/articles') }}" class="text-blue-700 hover:underline text-lg">&larr; Back to articles</a>
     </div>
 </div>
 @endsection

@@ -1,3 +1,21 @@
+@import 'tailwindcss';
+
+/* The pages were first built with the Tailwind 3 CDN script. These two rules keep Tailwind 3's
+   defaults (a light grey border colour and a pointer cursor on buttons) so nothing looks different. */
+@layer base {
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+        border-color: var(--color-gray-200, currentColor);
+    }
+
+    button:not(:disabled),
+    [role='button']:not(:disabled) {
+        cursor: pointer;
+    }
+}
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';

@@ -114,7 +114,7 @@ Visitors who step too close report sudden cold spots, static in the air, and a h
 But the bravest—or the most foolish—still come, drawn by curiosity or thrill. They say the house wants to be remembered, and it won’t let you forget once you\'ve stepped inside.
 
 So if you find yourself near Hollow Creek after sundown, beware. The house is always waiting',
-    'image' => 'images/CAP1NugSQo2wL12iT16SDklMTyu8acRvxpCJUsLf.jpg',
+    'image' => 'images/CAP1NugSQo2wL12iT16SDklMTyu8acRvxpCJUsLf.webp',
     'author_id' => 1,
     'category_id' => 1,
     'created_at' => '2025-05-07 09:05:26',
@@ -129,7 +129,7 @@ So if you find yourself near Hollow Creek after sundown, beware. The house is al
 The story follows a teenage girl and her unlikely group of adventurers who must save the Overworld after the powerful Ender Dragon begins a path of destruction. While details remain under wraps, fans can expect familiar biomes, mobs, and the signature blocky aesthetic—all reimagined in a cinematic adventure.
 
 As one of the best-selling games of all time, Minecraft has influenced a generation with its open-ended gameplay. The movie adaptation has the potential to reach new audiences while giving longtime fans a fresh way to experience their favorite virtual universe.',
-    'image' => 'images/2oFHVOUlGLMh5Fx4bQ7Ich7IB7YNBT1xlPLIVP8O.jpg',
+    'image' => 'images/2oFHVOUlGLMh5Fx4bQ7Ich7IB7YNBT1xlPLIVP8O.webp',
     'author_id' => 1,
     'category_id' => 4,
     'created_at' => '2025-05-07 09:07:23',
@@ -146,7 +146,7 @@ While Rockstar cites the need for "polish and perfection" as the main reason, ma
 Set in a modern-day Vice City with a rumored duo of protagonists, GTA 6 promises a richer open-world experience, dynamic storytelling, and advanced AI. However, with each delay, fans are left wondering whether the wait will truly be worth it.
 
 Rockstar maintains that they are committed to delivering a game that exceeds expectations—but as patience wears thin, players are hoping this will be the last delay before the long-awaited return to the criminal underworld.',
-    'image' => 'images/R9mOxxlcMxTGkss0S2MHqKbAc34Pw6OgVWBCcXLF.png',
+    'image' => 'images/R9mOxxlcMxTGkss0S2MHqKbAc34Pw6OgVWBCcXLF.webp',
     'author_id' => 2,
     'category_id' => 4,
     'created_at' => '2025-05-12 13:22:57',
@@ -167,7 +167,7 @@ Fans of both actors have taken to social media, debating who’s to blame, while
 Will "Silent Echoes" be remembered for its suspenseful plot—or the fireworks behind the scenes?
 
 Would you like a fake gossip magazine cover or social media mockup featuring this drama?',
-    'image' => 'images/zgdqiKTHxKEjAWDkSHP0rXlESBz8wP8UH7sbPJ27.png',
+    'image' => 'images/zgdqiKTHxKEjAWDkSHP0rXlESBz8wP8UH7sbPJ27.webp',
     'author_id' => 3,
     'category_id' => 2,
     'created_at' => '2025-05-12 13:26:03',
@@ -182,7 +182,7 @@ Would you like a fake gossip magazine cover or social media mockup featuring thi
 However, Sunday brings a shift, as clouds roll in and scattered showers are expected by late morning, especially in coastal and northern areas. Temperatures will dip slightly, hovering around 18°C (64°F), with increased humidity in the afternoon.
 
 Don’t forget to pack an umbrella if you\'re heading out on Sunday—and make the most of Saturday\'s sunshine while it lasts! Stay tuned for updates as the forecast develops.',
-    'image' => 'images/HbcOPglj3upLHkuYTaLKNaVwB1AObuEmHruONeVb.jpg',
+    'image' => 'images/HbcOPglj3upLHkuYTaLKNaVwB1AObuEmHruONeVb.webp',
     'author_id' => 5,
     'category_id' => 7,
     'created_at' => '2025-05-12 14:29:15',

@@ -54,7 +54,7 @@
                     @if ($article->image)
                         <p class="mt-2">Current Image:</p>
                         <img src="{{ asset('storage/' . $article->image) }}" alt="{{ $article->title }}"
-                            class="w-32 h-32 object-cover rounded-lg mt-2">
+                            width="128" height="128" loading="lazy" class="w-32 h-32 object-cover rounded-lg mt-2">
                     @endif
                     @error('image')
                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -64,11 +64,11 @@
                 <!-- Submit Button -->
                 <div class="mt-6">
                     <button type="submit"
-                        class="bg-blue-500 text-white font-semibold py-3 px-6 rounded-lg shadow hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition">
+                        class="bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg shadow hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition">
                         Update Article
                     </button>
                     <a href="{{ route('articles.index') }}"
-                        class="ml-4 text-blue-500 hover:underline text-sm">Cancel</a>
+                        class="ml-4 text-blue-700 hover:underline text-sm">Cancel</a>
                 </div>
             </form>
         </div>

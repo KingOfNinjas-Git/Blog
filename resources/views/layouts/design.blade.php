@@ -1,7 +1,3 @@
-<!-- resources/views/layouts/app.blade.php -->
-
-<!DOCTYPE html>
-<html lang="en">
 <!DOCTYPE html>
 <html lang="en">
 
@@ -10,12 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Blog</title>
     @include('partials.share-head')
-    <script src="https://cdn.tailwindcss.com"></script> <!-- TAILWIND!!! -->
+    @vite('resources/css/app.css')
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&family=Press+Start+2P&family=Silkscreen:wght@400;700&display=swap"
-        rel="stylesheet">
+    <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'"
+        href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&family=Press+Start+2P&family=Silkscreen:wght@400;700&display=swap">
+    <noscript>
+        <link rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&family=Press+Start+2P&family=Silkscreen:wght@400;700&display=swap">
+    </noscript>
     <style>
         .press-start-2p-regular {
             font-family: "Press Start 2P", system-ui;
@@ -55,9 +54,9 @@
 
 <body class="flex items-center justify-center min-h-screen bg-gradient-to-r from-blue-500 via-cyan-500 to-blue-700">
     @include('partials.demo-bar')
-    <div class="container text-center mx-auto rounded-lg w-screen h-screen py-4">
+    <main id="main-content" class="container text-center mx-auto rounded-lg w-screen h-screen py-4">
         @yield('content')
-    </div>
+    </main>
 </body>
 
 </html>
