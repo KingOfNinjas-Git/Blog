@@ -54,7 +54,7 @@
 
 <body class="flex items-center justify-center min-h-screen bg-gradient-to-r from-blue-500 via-cyan-500 to-blue-700">
     @include('partials.demo-bar')
-    <main id="main-content" class="container text-center mx-auto rounded-lg w-screen h-screen py-4">
+    <main id="main-content" class="container text-center mx-auto rounded-lg w-full min-h-screen py-4">
         @yield('content')
     </main>
 </body>

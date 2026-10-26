@@ -5,29 +5,29 @@
     <div class="min-h-screen">
         <!-- Navbar de categorias -->
         <nav class="bg-gradient-to-r from-blue-500 to-cyan-500 text-white py-4 shadow-lg  ">
-            <div class="container mx-auto flex space-x-4 overflow-x-auto justify-center items-center pixelify-sans-category">
+            <div class="container mx-auto flex space-x-4 overflow-x-auto justify-start xl:justify-center items-center px-4 pixelify-sans-category">
                 <a href="{{ route('articles.index') }}" 
-                   class="px-6 py-2 rounded-full bg-white text-blue-700 font-semibold shadow-md hover:bg-blue-600 hover:text-white transition-all duration-300">
+                   class="whitespace-nowrap shrink-0 px-6 py-2 rounded-full bg-white text-blue-700 font-semibold shadow-md hover:bg-blue-600 hover:text-white transition-all duration-300">
                     ALL CATEGORIES
                 </a>
                 @foreach ($categories as $category)
                     <a href="{{ route('articles.index', ['category' => $category->id]) }}" 
-                       class="px-6 py-2 rounded-full bg-white text-blue-700 font-semibold shadow-md hover:bg-blue-600 hover:text-white transition-all duration-300">
+                       class="whitespace-nowrap shrink-0 px-6 py-2 rounded-full bg-white text-blue-700 font-semibold shadow-md hover:bg-blue-600 hover:text-white transition-all duration-300">
                         {{ $category->name }}
                     </a>
                 @endforeach
             </div>
         </nav>
 
-        <div class="container mx-auto p-8 bg-white rounded-lg shadow-lg border border-blue-400">
+        <div class="container mx-auto p-4 md:p-8 bg-white rounded-lg shadow-lg border border-blue-400">
             <!-- Flexbox Layout -->
             <div class="flex flex-col lg:flex-row gap-8">
                 <!-- Main Content -->
                 <div class="flex-grow">
                     <!-- Header Section -->
-                    <div class="flex justify-between items-center mb-8">
-                        <h1 class="text-4xl font-extrabold text-cyan-600 press-start-2p-regular">ARTICLES</h1>
-                        <div class="flex items-center space-x-4">
+                    <div class="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-4 mb-8">
+                        <h1 class="text-2xl sm:text-4xl font-extrabold text-cyan-600 press-start-2p-regular">ARTICLES</h1>
+                        <div class="flex flex-wrap items-center gap-3">
                             @if (Auth::check())
                                 <span class="text-[#0486A2]">Welcome, <strong>{{ Auth::user()->name }}</strong>!</span>
                                 <a href="{{ route('articles.create') }}"
@@ -98,7 +98,7 @@
 
                                     <div class="flex items-center justify-between mt-2">
                                         <!-- Like, Comments, and Date -->
-                                        <div class="flex items-center space-x-4">
+                                        <div class="flex flex-wrap items-center gap-3">
                                             <form method="POST" action="{{ route('articles.like', $article->id) }}">
                                                 @csrf
                                                 <button type="submit" class="text-blue-700 hover:text-blue-600 transition text-sm">
