@@ -9,6 +9,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Blog</title>
+    @include('partials.share-head')
     <script src="https://cdn.tailwindcss.com"></script> <!-- TAILWIND!!! -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -53,6 +54,7 @@
 </head>
 
 <body class="flex items-center justify-center min-h-screen bg-gradient-to-r from-blue-500 via-cyan-500 to-blue-700">
+    @include('partials.demo-bar')
     <div class="container text-center mx-auto rounded-lg w-screen h-screen py-4">
         @yield('content')
     </div>

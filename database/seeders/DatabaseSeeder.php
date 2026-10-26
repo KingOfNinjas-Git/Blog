@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Support\DemoMode;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -13,11 +13,19 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        $this->call(BlogContentSeeder::class);
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        // The portfolio demo needs a user behind each starting author (see DemoMode::placeholderUsers).
+        if (DemoMode::enabled()) {
+            DemoMode::placeholderUsers();
+        }
+
+        // A test account for local development only (it needs the dev-only faker package).
+        if (app()->environment('local') && class_exists(\Faker\Factory::class)) {
+            User::factory()->create([
+                'name' => 'Test User',
+                'email' => 'test@example.com',
+            ]);
+        }
     }
 }
