@@ -1,5 +1,7 @@
 @extends('layouts.design')
 
+@section('title', 'My Blog | Stories, ideas and tips')
+
 @section('content')
     {{-- Categories --}}
     <nav class="bg-gradient-to-r from-blue-500 to-cyan-500 py-4 text-white shadow-lg" aria-label="Categories">

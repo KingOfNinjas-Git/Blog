@@ -91,4 +91,30 @@ class DemoModeTest extends TestCase
         $this->assertSame(BlogContentSeeder::ARTICLES[0]['title'], Article::find(BlogContentSeeder::ARTICLES[0]['id'])->title);
         $this->assertSame(count(BlogContentSeeder::AUTHORS), User::where('email', 'like', '%@blog.demo')->count());
     }
+
+    public function test_the_demo_asks_search_engines_not_to_index_it_but_a_real_blog_does_not(): void
+    {
+        (new BlogContentSeeder)->run();
+
+        $this->get('/')->assertHeaderMissing('X-Robots-Tag');
+
+        config(['demo.enabled' => true]);
+        $this->get('/')->assertOk()->assertHeader('X-Robots-Tag', 'noindex');
+    }
+
+    public function test_the_cleanup_keeps_the_small_copies_of_pictures_that_articles_use(): void
+    {
+        config(['demo.enabled' => true]);
+        (new BlogContentSeeder)->run();
+        $image = Article::whereNotNull('image')->first()->image;
+        Storage::disk('public')->put($image, 'full');
+        Storage::disk('public')->put(\App\Support\ArticleImage::thumbPath($image), 'small');
+        Storage::disk('public')->put('images/stray-600.webp', 'nobody uses this');
+
+        Cache::forget('demo-cleanup');
+        DemoMode::cleanUp();
+
+        Storage::disk('public')->assertExists(\App\Support\ArticleImage::thumbPath($image));
+        Storage::disk('public')->assertMissing('images/stray-600.webp');
+    }
 }

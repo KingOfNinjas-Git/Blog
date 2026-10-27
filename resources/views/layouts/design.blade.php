@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Blog</title>
+    <title>@yield('title', 'My Blog | Stories, ideas and tips')</title>
     @include('partials.share-head')
     @vite('resources/css/app.css')
     <link rel="preconnect" href="https://fonts.googleapis.com">

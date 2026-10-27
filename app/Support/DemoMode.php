@@ -61,6 +61,7 @@ class DemoMode
 
         // Pictures that no remaining article uses.
         $used = Article::pluck('image')->filter()->all();
+        $used = array_merge($used, array_map([ArticleImage::class, 'thumbPath'], $used)); // and their small copies
         $disk = Storage::disk('public');
         foreach ($disk->files('images') as $file) {
             if (! in_array($file, $used, true)) {

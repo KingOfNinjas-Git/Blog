@@ -6,6 +6,7 @@ use App\Models\Article;
 use App\Models\Author;
 use App\Models\Category;
 use App\Models\User;
+use App\Support\ArticleImage;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -96,6 +97,33 @@ class ArticleTest extends TestCase
         $this->assertStringEndsWith('.webp', $article->image);
         Storage::disk('public')->assertExists($article->image);
         $this->assertSame(1000, getimagesize(Storage::disk('public')->path($article->image))[0]);
+
+        // The list gets a smaller copy, offered as a srcset; deleting the article removes both pictures.
+        $thumb = ArticleImage::thumbPath($article->image);
+        Storage::disk('public')->assertExists($thumb);
+        $this->assertSame(600, getimagesize(Storage::disk('public')->path($thumb))[0]);
+        $this->get('/')->assertSee($thumb.' 600w', false);
+        $this->actingAs($user)->delete(route('articles.destroy', $article));
+        Storage::disk('public')->assertMissing([$article->image, $thumb]);
+    }
+
+    public function test_missing_small_pictures_can_be_made_for_pictures_that_are_already_stored(): void
+    {
+        $old = Storage::disk('public')->putFileAs('images', UploadedFile::fake()->image('seed.png', 1000, 600), 'seed.webp');
+        $this->article($this->writer(), ['image' => $old]);
+
+        $this->artisan('articles:thumbs')->assertSuccessful();
+
+        Storage::disk('public')->assertExists('images/seed-600.webp');
+        $this->assertNull(ArticleImage::srcset(null));
+    }
+
+    public function test_pages_have_titles_that_say_what_they_are(): void
+    {
+        $article = $this->article($this->writer(), ['title' => 'A very specific title']);
+
+        $this->get('/')->assertSee('<title>My Blog | Stories, ideas and tips</title>', false);
+        $this->get(route('articles.show', $article))->assertSee('<title>A very specific title | My Blog</title>', false);
     }
 
     public function test_an_article_needs_a_title_content_and_a_real_category(): void

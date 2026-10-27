@@ -1,5 +1,7 @@
 @extends('layouts.design')
 
+@section('title', $article->title.' | My Blog')
+
 @section('content')
     <article class="mx-auto max-w-3xl rounded-3xl border border-blue-300 bg-white p-6 text-left shadow-2xl shadow-blue-950/20 md:p-8">
         <h1 class="silkscreen-bold mb-4 text-3xl font-bold text-gray-800">{{ $article->title }}</h1>

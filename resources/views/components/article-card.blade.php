@@ -3,8 +3,11 @@
 <article class="flex flex-col overflow-hidden rounded-2xl border border-blue-200 bg-blue-50 text-left shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl">
     @if ($article->image)
         <a href="{{ route('articles.show', $article) }}" tabindex="-1" aria-hidden="true">
-            <img src="{{ asset('storage/'.$article->image) }}" alt="" width="1000" height="600" decoding="async"
-                 @unless ($eager) loading="lazy" @endunless class="h-64 w-full object-cover">
+            @php $srcset = \App\Support\ArticleImage::srcset($article->image); @endphp
+            <img src="{{ $srcset ? asset('storage/'.\App\Support\ArticleImage::thumbPath($article->image)) : asset('storage/'.$article->image) }}"
+                 @if ($srcset) srcset="{{ $srcset }}" sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" @endif
+                 alt="" width="1000" height="600" decoding="async"
+                 @if ($eager) fetchpriority="high" @else loading="lazy" @endif class="h-64 w-full object-cover">
         </a>
     @endif
 
