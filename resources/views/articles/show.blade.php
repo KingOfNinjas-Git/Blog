@@ -1,74 +1,67 @@
 @extends('layouts.design')
 
 @section('content')
-<div class="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-lg border border-blue-400">
-    <h1 class="text-3xl font-bold text-gray-800 mb-4 silkscreen-bold">{{ $article->title }}</h1>
+    <article class="mx-auto max-w-3xl rounded-3xl border border-blue-300 bg-white p-6 text-left shadow-2xl shadow-blue-950/20 md:p-8">
+        <h1 class="silkscreen-bold mb-4 text-3xl font-bold text-gray-800">{{ $article->title }}</h1>
 
-    <div class="mb-4">
-        <p class="text-sm text-gray-600 silkscreen-regular">
-            <strong>By:</strong> {{ $article->author->name }}
+        <p class="silkscreen-regular mb-6 text-sm text-gray-600">
+            <strong>By:</strong> <a href="{{ route('articles.index', ['search' => '@'.$article->author->name]) }}" class="hover:underline">{{ $article->author->name }}</a><br>
+            <strong>Category:</strong> <a href="{{ route('articles.index', ['category' => $article->category_id]) }}" class="hover:underline">{{ $article->category->name }}</a>
         </p>
-        <p class="text-sm text-gray-600 silkscreen-regular">
-            <strong>Category:</strong> {{ $article->category->name }}
-        </p>
-    </div>
 
-    @if ($article->image)
-        <div class="mb-6">
+        @if ($article->image)
             @php($size = $article->imageSize())
-            <img src="{{ asset('storage/' . $article->image) }}" alt="{{ $article->title }}" fetchpriority="high" decoding="async" @if($size) width="{{ $size[0] }}" height="{{ $size[1] }}" @endif class="w-full h-auto rounded-lg shadow-md">
-        </div>
-    @endif
+            <img src="{{ asset('storage/'.$article->image) }}" alt="{{ $article->title }}" fetchpriority="high" decoding="async"
+                 @if ($size) width="{{ $size[0] }}" height="{{ $size[1] }}" @endif class="mb-6 h-auto w-full rounded-2xl shadow-md">
+        @endif
 
-    <div class="mb-6">
-        <div class="text-gray-700 leading-relaxed silkscreen-regular">
-            {!! nl2br(e($article->content)) !!}
-        </div>
-    </div>
+        <div class="silkscreen-regular mb-6 leading-relaxed text-gray-700">{!! nl2br(e($article->content)) !!}</div>
 
-   <!-- Comments Section -->
-    <div class="mt-12">
-        <h2 class="text-3xl font-bold text-gray-800 mb-8 silkscreen-bold text-center border-b-4 border-blue-500 pb-2">Comments</h2>
-
-        <!-- Display Comments -->
-        @forelse ($article->comments as $comment)
-            <div class="mb-6 p-6 bg-white border border-gray-200 rounded-lg shadow-md">
-                <div class="flex items-center mb-4">
-                    <div class="text-blue-600 font-semibold silkscreen-regular text-lg">{{ $comment->user->name }}</div>
-                    <div class="ml-auto text-sm text-gray-600">{{ $comment->created_at->diffForHumans() }}</div>
-                </div>
-                <p class="text-gray-700 silkscreen-regular text-left leading-relaxed">{{ $comment->content }}</p>
+        @if ($article->isWrittenBy(auth()->user()))
+            <div class="mb-6 flex gap-3">
+                <a href="{{ route('articles.edit', $article) }}" class="rounded-full bg-yellow-400 px-5 py-2 font-semibold text-yellow-950 shadow transition hover:bg-yellow-300">✏️ Edit</a>
+                <form method="POST" action="{{ route('articles.destroy', $article) }}" onsubmit="return confirm('Are you sure you want to delete this article?')">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="rounded-full bg-red-500 px-5 py-2 font-semibold text-white shadow transition hover:bg-red-600">🗑️ Delete</button>
+                </form>
             </div>
-        @empty
-            <p class="text-gray-600 text-center text-lg">No comments yet. Be the first to comment!</p>
-        @endforelse
+        @endif
 
-        <!-- Add Comment Form -->
-        @auth
-            <form action="{{ route('articles.comments.store', $article->id) }}" method="POST" class="mt-10 bg-blue-50 p-8 rounded-lg shadow-lg">
-                @csrf
-                <h3 class="text-2xl font-semibold mb-6 text-blue-700 text-center">Leave a Comment</h3>
-                <div class="mb-6">
-                    <textarea name="content" id="content" rows="5"
-                        class="w-full p-4 text-sm border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="Write your comment here..." required></textarea>
-                </div>
-                <div class="flex justify-center">
-                    <button type="submit"
-                        class="bg-blue-600 text-white font-semibold py-3 px-8 rounded-lg shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
-                        Submit Comment
-                    </button>
-                </div>
-            </form>
-        @else
-            <p class="text-gray-600 text-center mt-6 text-lg">
-                You must <a href="{{ route('login') }}" class="text-blue-700 hover:underline">log in</a> to leave a comment.
-            </p>
-        @endauth
-    </div>
+        <section class="mt-12" aria-labelledby="comments-title">
+            <h2 id="comments-title" class="silkscreen-bold mb-8 border-b-4 border-blue-500 pb-2 text-center text-3xl font-bold text-gray-800">Comments</h2>
 
-    <div class="mt-8">
-        <a href="{{ url('/articles') }}" class="text-blue-700 hover:underline text-lg">&larr; Back to articles</a>
-    </div>
-</div>
+            @forelse ($article->comments as $comment)
+                <div class="mb-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-md">
+                    <div class="mb-3 flex items-center">
+                        <span class="silkscreen-regular text-lg font-semibold text-blue-700">{{ $comment->user->name }}</span>
+                        <span class="ml-auto text-sm text-gray-600">{{ $comment->created_at->diffForHumans() }}</span>
+                    </div>
+                    <p class="silkscreen-regular leading-relaxed text-gray-700">{{ $comment->content }}</p>
+                </div>
+            @empty
+                <p class="text-center text-lg text-gray-600">No comments yet. Be the first to comment!</p>
+            @endforelse
+
+            @auth
+                <form action="{{ route('articles.comments.store', $article) }}" method="POST" class="mt-10 rounded-2xl bg-blue-50 p-6 shadow-lg md:p-8">
+                    @csrf
+                    <h3 class="mb-6 text-center text-2xl font-semibold text-blue-700">Leave a Comment</h3>
+                    <label for="content" class="sr-only">Your comment</label>
+                    <textarea name="content" id="content" rows="5" required maxlength="1000" placeholder="Write your comment here..."
+                              class="mb-2 w-full rounded-xl border border-gray-300 p-4 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500">{{ old('content') }}</textarea>
+                    @error('content')<p class="mb-4 text-sm text-red-600">{{ $message }}</p>@enderror
+                    <div class="mt-4 flex justify-center">
+                        <button type="submit" class="rounded-full bg-blue-600 px-8 py-3 font-semibold text-white shadow transition hover:bg-blue-700">Submit Comment</button>
+                    </div>
+                </form>
+            @else
+                <p class="mt-6 text-center text-lg text-gray-600">
+                    You must <a href="{{ route('login') }}" class="text-blue-700 hover:underline">log in</a> to leave a comment.
+                </p>
+            @endauth
+        </section>
+
+        <p class="mt-8"><a href="{{ route('articles.index') }}" class="text-lg text-blue-700 hover:underline">&larr; Back to articles</a></p>
+    </article>
 @endsection
