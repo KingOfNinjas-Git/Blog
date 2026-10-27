@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Article;
 use App\Models\Author;
 use App\Models\User;
+use App\Support\ArticleImage;
 use App\Support\DemoMode;
 use Database\Seeders\BlogContentSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -108,13 +109,13 @@ class DemoModeTest extends TestCase
         (new BlogContentSeeder)->run();
         $image = Article::whereNotNull('image')->first()->image;
         Storage::disk('public')->put($image, 'full');
-        Storage::disk('public')->put(\App\Support\ArticleImage::thumbPath($image), 'small');
+        Storage::disk('public')->put(ArticleImage::thumbPath($image), 'small');
         Storage::disk('public')->put('images/stray-600.webp', 'nobody uses this');
 
         Cache::forget('demo-cleanup');
         DemoMode::cleanUp();
 
-        Storage::disk('public')->assertExists(\App\Support\ArticleImage::thumbPath($image));
+        Storage::disk('public')->assertExists(ArticleImage::thumbPath($image));
         Storage::disk('public')->assertMissing('images/stray-600.webp');
     }
 }
