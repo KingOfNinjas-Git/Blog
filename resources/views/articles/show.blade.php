@@ -47,7 +47,7 @@
 
         @if ($article->image)
             <figure class="mt-8 overflow-hidden rounded-[2rem] border border-line bg-surface-2 shadow-lg">
-                <img src="{{ asset('storage/'.$article->image) }}" alt="{{ $article->title }}" fetchpriority="high" decoding="async"
+                <img src="{{ asset('storage/'.$article->image) }}" alt="{{ $article->image_alt ?: $article->title }}" fetchpriority="high" decoding="async"
                      @if ($size) width="{{ $size[0] }}" height="{{ $size[1] }}" @endif class="h-auto w-full">
             </figure>
         @endif

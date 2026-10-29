@@ -283,4 +283,30 @@ class ArticleTest extends TestCase
         $this->assertStringEndsWith('...', $text);
         $this->assertLessThanOrEqual(43, mb_strlen($text)); // 40 characters plus the dots
     }
+
+    public function test_a_picture_description_is_saved_and_read_out_instead_of_the_title(): void
+    {
+        $user = $this->writer();
+        $category = Category::create(['name' => 'GAMES']);
+
+        $this->actingAs($user)->post('/articles', [
+            'title' => 'Barn story', 'content' => 'Body', 'category_id' => $category->id,
+            'image' => UploadedFile::fake()->image('barn.jpg', 800, 500), 'image_alt' => 'A red barn in a green field',
+        ])->assertRedirect();
+        $described = Article::firstWhere('title', 'Barn story');
+        $this->assertSame('A red barn in a green field', $described->image_alt);
+        $this->get(route('articles.show', $described))->assertSee('alt="A red barn in a green field"', false);
+
+        $this->actingAs($user)->post('/articles', [
+            'title' => 'No description', 'content' => 'Body', 'category_id' => $category->id, 'image' => UploadedFile::fake()->image('x.jpg', 800, 500),
+        ])->assertRedirect();
+        $this->get(route('articles.show', Article::firstWhere('title', 'No description')))->assertSee('alt="No description"', false);
+
+        $this->actingAs($user)->post('/articles', ['title' => 'Too long', 'content' => 'x', 'category_id' => $category->id, 'image_alt' => str_repeat('a', 201)])->assertSessionHasErrors('image_alt');
+    }
+
+    public function test_the_fonts_come_from_this_site_not_from_google(): void
+    {
+        $this->get('/')->assertOk()->assertDontSee('fonts.googleapis.com')->assertDontSee('fonts.gstatic.com');
+    }
 }

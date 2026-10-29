@@ -102,6 +102,7 @@ But the bravest—or the most foolish—still come, drawn by curiosity or thrill
 
 So if you find yourself near Hollow Creek after sundown, beware. The house is always waiting',
             'image' => 'images/CAP1NugSQo2wL12iT16SDklMTyu8acRvxpCJUsLf.webp',
+            'image_alt' => 'A crooked old mansion standing alone behind bare, twisted trees',
             'author_id' => 1,
             'category_id' => 1,
             'created_at' => '2025-05-07 09:05:26',
@@ -116,6 +117,7 @@ The story follows a teenage girl and her unlikely group of adventurers who must 
 
 As one of the best-selling games of all time, Minecraft has influenced a generation with its open-ended gameplay. The movie adaptation has the potential to reach new audiences while giving longtime fans a fresh way to experience their favorite virtual universe.',
             'image' => 'images/2oFHVOUlGLMh5Fx4bQ7Ich7IB7YNBT1xlPLIVP8O.webp',
+            'image_alt' => 'Glowing turquoise ore blocks in a dark Minecraft cave',
             'author_id' => 1,
             'category_id' => 4,
             'created_at' => '2025-05-07 09:07:23',
@@ -132,6 +134,7 @@ Set in a modern-day Vice City with a rumored duo of protagonists, GTA 6 promises
 
 Rockstar maintains that they are committed to delivering a game that exceeds expectations—but as patience wears thin, players are hoping this will be the last delay before the long-awaited return to the criminal underworld.',
             'image' => 'images/R9mOxxlcMxTGkss0S2MHqKbAc34Pw6OgVWBCcXLF.webp',
+            'image_alt' => 'Two characters leaning on a sports car on a sunny, palm-lined street',
             'author_id' => 2,
             'category_id' => 4,
             'created_at' => '2025-05-12 13:22:57',
@@ -152,6 +155,7 @@ Will "Silent Echoes" be remembered for its suspenseful plot—or the fireworks b
 
 Would you like a fake gossip magazine cover or social media mockup featuring this drama?',
             'image' => 'images/zgdqiKTHxKEjAWDkSHP0rXlESBz8wP8UH7sbPJ27.webp',
+            'image_alt' => 'A newspaper-style headline above the tense faces of a woman and a man',
             'author_id' => 3,
             'category_id' => 2,
             'created_at' => '2025-05-12 13:26:03',
@@ -166,6 +170,7 @@ However, Sunday brings a shift, as clouds roll in and scattered showers are expe
 
 Don’t forget to pack an umbrella if you\'re heading out on Sunday—and make the most of Saturday\'s sunshine while it lasts! Stay tuned for updates as the forecast develops.',
             'image' => 'images/HbcOPglj3upLHkuYTaLKNaVwB1AObuEmHruONeVb.webp',
+            'image_alt' => 'Green trees and white clouds under a bright blue sky',
             'author_id' => 5,
             'category_id' => 7,
             'created_at' => '2025-05-12 14:29:15',

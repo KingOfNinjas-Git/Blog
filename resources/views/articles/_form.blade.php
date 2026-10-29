@@ -43,6 +43,12 @@
         <img id="image-preview" src="{{ $article?->image ? asset('storage/'.$article->image) : '' }}" alt="Preview of the cover picture" class="max-h-72 w-full object-cover">
     </figure>
 
+    <div>
+        <label for="image_alt" class="mb-1.5 block text-sm font-bold">What the picture shows <span class="font-normal text-ink-soft">(for people who cannot see it)</span></label>
+        <input id="image_alt" type="text" name="image_alt" value="{{ old('image_alt', $article?->image_alt) }}" maxlength="200" placeholder="e.g. A crooked old mansion behind bare trees" class="field">
+        <p class="mt-1.5 text-xs text-ink-soft">A short description read out by screen readers. If you leave it empty the title is used.</p>
+    </div>
+
     <div class="flex flex-col gap-3 pt-2 sm:flex-row">
         <button type="submit" class="btn btn-primary !py-3 sm:flex-1">{{ $article ? 'Save Changes' : 'Create Article' }}</button>
         <a href="{{ $article ? route('articles.show', $article) : route('articles.index') }}" class="btn btn-ghost !py-3 sm:flex-1">Cancel</a>

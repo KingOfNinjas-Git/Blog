@@ -19,11 +19,4 @@
 @else
     @include('partials.share-head')
 @endif
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'"
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Pixelify+Sans:wght@400..700&family=Press+Start+2P&display=swap">
-<noscript>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Pixelify+Sans:wght@400..700&family=Press+Start+2P&display=swap">
-</noscript>
 @vite(['resources/css/app.css', 'resources/js/app.js'])

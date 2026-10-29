@@ -1,5 +1,10 @@
 @import 'tailwindcss';
 
+/* The fonts come from this site (not from Google): faster first paint, nothing shared with a third party */
+@import '@fontsource-variable/inter/wght.css';
+@import '@fontsource-variable/pixelify-sans/wght.css';
+@import '@fontsource/press-start-2p/latin-400.css';
+
 /* ------------------------------------------------------------------------------------------
    Pixel Press: the look of the blog. Colours are variables so the light and dark themes (and a
    visitor's own choice, remembered in the browser) switch by changing one attribute on <html>.
@@ -59,9 +64,9 @@
     --color-cyan: var(--cyan);
     --color-danger: var(--danger);
     --color-danger-soft: var(--danger-soft);
-    --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji';
+    --font-sans: 'Inter Variable', 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji';
     --font-pixel: 'Press Start 2P', ui-monospace, monospace;
-    --font-pixel-sm: 'Pixelify Sans', ui-monospace, monospace;
+    --font-pixel-sm: 'Pixelify Sans Variable', 'Pixelify Sans', ui-monospace, monospace;
     --font-read: ui-serif, 'Iowan Old Style', 'Palatino Linotype', Georgia, 'Times New Roman', serif;
 }
 

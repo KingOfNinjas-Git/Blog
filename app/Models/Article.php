@@ -12,7 +12,7 @@ class Article extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title', 'content', 'author_id', 'category_id', 'image'];
+    protected $fillable = ['title', 'content', 'author_id', 'category_id', 'image', 'image_alt'];
 
     /** The list page's filters: ?category=<id> and ?search=<words in the title>, or ?search=@<author name>. */
     public function scopeFilter(Builder $query, array $filters): Builder
