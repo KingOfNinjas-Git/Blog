@@ -50,7 +50,7 @@ class ArticleTest extends TestCase
 
         $titles = fn (string $url) => $this->get($url)->assertOk()->viewData('articles')->pluck('title')->all();
 
-        $this->assertSame(['Zelda review', 'Football night'], $titles('/'));
+        $this->assertSame(['Football night', 'Zelda review'], $titles('/')); // newest first
         $this->assertSame(['Zelda review'], $titles('/articles?category='.$games->id));
         $this->assertSame(['Football night'], $titles('/articles?search=football'));
         $this->assertSame(['Zelda review'], $titles('/articles?search=@Ana'));
@@ -200,5 +200,87 @@ class ArticleTest extends TestCase
         $this->actingAs($reader)->post("/articles/{$article->id}/comments", ['content' => str_repeat('x', 1001)])->assertSessionHasErrors('content');
         $this->actingAs($reader)->post('/articles/9999/comments', ['content' => 'Lost'])->assertNotFound();
         $this->assertSame(1, $article->comments()->count());
+    }
+
+    public function test_the_list_can_be_ordered_by_likes_or_by_comments(): void
+    {
+        $writer = $this->writer();
+        $quiet = $this->article($writer, ['title' => 'Quiet one']);
+        $liked = $this->article($writer, ['title' => 'Liked one']);
+        $talked = $this->article($writer, ['title' => 'Talked about']);
+        $fans = User::factory()->count(2)->create();
+        foreach ($fans as $fan) {
+            $liked->reactions()->create(['user_id' => $fan->id, 'type' => 'like']);
+            $talked->comments()->create(['user_id' => $fan->id, 'content' => 'Hi']);
+        }
+        $talked->comments()->create(['user_id' => $fans[0]->id, 'content' => 'Again']);
+
+        $titles = fn (string $url) => $this->get($url)->assertOk()->viewData('articles')->pluck('title')->all();
+
+        $this->assertSame(['Talked about', 'Liked one', 'Quiet one'], $titles('/')); // newest first
+        $this->assertSame(['Liked one', 'Talked about', 'Quiet one'], $titles('/?sort=popular'));
+        $this->assertSame(['Talked about', 'Liked one', 'Quiet one'], $titles('/?sort=discussed'));
+        $this->assertSame(['Talked about', 'Liked one', 'Quiet one'], $titles('/?sort=nonsense')); // unknown order: the default
+    }
+
+    public function test_the_first_page_features_the_newest_article_and_the_most_liked_are_trending(): void
+    {
+        $writer = $this->writer();
+        $this->article($writer, ['title' => 'Old news']);
+        $this->article($writer, ['title' => 'Middle']);
+        $newest = $this->article($writer, ['title' => 'Brand new']);
+        $newest->reactions()->create(['user_id' => User::factory()->create()->id, 'type' => 'like']);
+
+        $page = $this->get('/')->assertOk();
+        $this->assertTrue($page->viewData('featured')->is($newest)); // the newest of them all
+        $this->assertSame(['Middle', 'Old news'], $page->viewData('items')->pluck('title')->all()); // not repeated in the grid
+        $this->assertSame(['Brand new'], $page->viewData('trending')->pluck('title')->all()); // only articles that have a like
+        $page->assertSee('Trending now')->assertSee('Latest');
+
+        // No big card or trending list while searching, filtering or choosing another order
+        foreach (['/?search=Old', '/?category='.Category::first()->id.'&page=2', '/?sort=popular'] as $url) {
+            $this->get($url)->assertOk()->assertViewHas('featured', null);
+        }
+        $this->get('/?sort=popular')->assertDontSee('Trending now');
+    }
+
+    public function test_an_article_page_shows_reading_time_paragraphs_and_more_to_read(): void
+    {
+        $writer = $this->writer();
+        $article = $this->article($writer, ['title' => 'Long read', 'content' => "First paragraph.\n\nSecond <b>paragraph</b>.\nSame paragraph, new line."]);
+        $this->article($writer, ['title' => 'Another one']);
+
+        $this->assertSame(1, $article->readingMinutes());
+        $this->assertSame(3, Article::make(['content' => str_repeat('word ', 450)])->readingMinutes());
+        $this->assertSame(['First paragraph.', "Second <b>paragraph</b>.\nSame paragraph, new line."], $article->paragraphs());
+
+        $this->get(route('articles.show', $article))->assertOk()
+            ->assertSee('<p>First paragraph.</p>', false)
+            ->assertSee('Second &lt;b&gt;paragraph&lt;/b&gt;.<br />', false) // text is escaped, a single new line becomes a line break
+            ->assertSee('1 min read')
+            ->assertSee('Keep reading')->assertSee('Another one')
+            ->assertSee('og:title" content="Long read"', false);
+    }
+
+    public function test_a_liked_article_shows_as_liked_to_the_person_who_liked_it(): void
+    {
+        $article = $this->article($this->writer());
+        $reader = User::factory()->create();
+        $article->reactions()->create(['user_id' => $reader->id, 'type' => 'like']);
+
+        $this->actingAs($reader)->get('/')->assertViewHas('likedIds', [$article->id]);
+        $this->actingAs($reader)->get(route('articles.show', $article))->assertViewHas('liked', true)->assertSee('You liked this article');
+        $this->actingAs(User::factory()->create())->get(route('articles.show', $article))->assertViewHas('liked', false);
+        $this->get('/')->assertViewHas('likedIds', []);
+    }
+
+    public function test_the_excerpt_is_plain_text_and_short(): void
+    {
+        $text = Article::make(['content' => "<b>Bold</b>   start\n\n".str_repeat('long ', 100)])->excerpt(40);
+
+        $this->assertStringNotContainsString('<b>', $text);
+        $this->assertStringStartsWith('Bold start long', $text);
+        $this->assertStringEndsWith('...', $text);
+        $this->assertLessThanOrEqual(43, mb_strlen($text)); // 40 characters plus the dots
     }
 }

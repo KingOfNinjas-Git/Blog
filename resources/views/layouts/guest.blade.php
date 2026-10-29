@@ -1,34 +1,24 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="csrf-token" content="{{ csrf_token() }}">
-
-        <title>{{ config('app.name', 'Laravel') }}</title>
-    @include('partials.share-head')
-
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-
-        <!-- Scripts -->
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
+        <title>{{ config('app.name', 'My Blog') }}</title>
+        @include('partials.head')
     </head>
-    <body class="font-sans text-gray-900 antialiased">
-    @include('partials.demo-bar')
-        <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0" style="background: linear-gradient(90deg, #3b82f6 0%, #06b6d4 50%, #1d4ed8 100%);">
-            <div>
-                <a href="/articles" style="font-family: 'Press Start 2P', system-ui; color: #fff; font-size: 1.5rem; text-shadow: 0 2px 0 rgba(0, 0, 0, 0.25);">MY BLOG</a>
-            </div>
-
-            <div class="w-full sm:max-w-md mt-6 px-6 py-6 bg-white shadow-lg overflow-hidden sm:rounded-lg border border-blue-400">
-                {{ $slot }}
-            </div>
+    <body class="min-h-screen">
+        @include('partials.demo-bar')
+        <div class="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-4 py-10">
+            <div class="pixel-bg pointer-events-none absolute inset-0" aria-hidden="true"></div>
+            <main id="main-content" class="relative w-full max-w-md">
+                <h1 class="sr-only">{{ $heading ?? 'Your My Blog account' }}</h1>
+                <a href="{{ route('articles.index') }}" class="mb-6 flex items-center justify-center gap-3" aria-label="My Blog, home">
+                    <span class="logo-mark" aria-hidden="true"><i></i><i class="off"></i><i></i><i></i><i></i><i></i><i class="off"></i><i></i><i class="off"></i></span>
+                    <span class="pixel-title text-sm">MY BLOG</span>
+                </a>
+                <div class="panel p-6 sm:p-8">
+                    {{ $slot }}
+                </div>
+                <p class="mt-6 text-center text-sm text-ink-soft"><a href="{{ route('articles.index') }}" class="font-semibold hover:text-brand">&larr; Back to the articles</a></p>
+            </main>
         </div>
     </body>
 </html>

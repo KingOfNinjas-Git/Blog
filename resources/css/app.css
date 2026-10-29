@@ -1,20 +1,68 @@
 @import 'tailwindcss';
 
-/* The pages were first built with the Tailwind 3 CDN script. These two rules keep Tailwind 3's
-   defaults (a light grey border colour and a pointer cursor on buttons) so nothing looks different. */
-@layer base {
-    *,
-    ::after,
-    ::before,
-    ::backdrop,
-    ::file-selector-button {
-        border-color: var(--color-gray-200, currentColor);
-    }
+/* ------------------------------------------------------------------------------------------
+   Pixel Press: the look of the blog. Colours are variables so the light and dark themes (and a
+   visitor's own choice, remembered in the browser) switch by changing one attribute on <html>.
+   ------------------------------------------------------------------------------------------ */
+:root {
+    --paper: #f6f5f1;
+    --surface: #ffffff;
+    --surface-2: #eeece5;
+    --ink: #14161f;
+    --ink-soft: #4a5064;
+    --line: #dedbd2;
+    --brand: #2446e0;
+    --on-brand: #ffffff;
+    --brand-soft: #e6ebff;
+    --accent: #ffc933;
+    --on-accent: #231a00;
+    --cyan: #076477;
+    --danger: #c92a2f;
+    --danger-soft: #fdeaea;
+    --shadow: 0 1px 2px rgb(20 22 31 / 6%), 0 8px 24px rgb(20 22 31 / 7%);
+    --shadow-lg: 0 2px 4px rgb(20 22 31 / 6%), 0 22px 50px rgb(20 22 31 / 14%);
+    color-scheme: light;
+}
 
-    button:not(:disabled),
-    [role='button']:not(:disabled) {
-        cursor: pointer;
-    }
+:root[data-theme='dark'] {
+    --paper: #0d0f17;
+    --surface: #161a26;
+    --surface-2: #1d2231;
+    --ink: #eef0f7;
+    --ink-soft: #a9afc3;
+    --line: #2b3145;
+    --brand: #8aa2ff;
+    --on-brand: #0d0f17;
+    --brand-soft: #1f2748;
+    --accent: #ffd34d;
+    --on-accent: #231a00;
+    --cyan: #3bd0ec;
+    --danger: #ff7b80;
+    --danger-soft: #3a1c20;
+    --shadow: 0 1px 2px rgb(0 0 0 / 30%), 0 8px 24px rgb(0 0 0 / 30%);
+    --shadow-lg: 0 2px 4px rgb(0 0 0 / 30%), 0 22px 50px rgb(0 0 0 / 50%);
+    color-scheme: dark;
+}
+
+@theme inline {
+    --color-paper: var(--paper);
+    --color-surface: var(--surface);
+    --color-surface-2: var(--surface-2);
+    --color-ink: var(--ink);
+    --color-ink-soft: var(--ink-soft);
+    --color-line: var(--line);
+    --color-brand: var(--brand);
+    --color-on-brand: var(--on-brand);
+    --color-brand-soft: var(--brand-soft);
+    --color-accent: var(--accent);
+    --color-on-accent: var(--on-accent);
+    --color-cyan: var(--cyan);
+    --color-danger: var(--danger);
+    --color-danger-soft: var(--danger-soft);
+    --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji';
+    --font-pixel: 'Press Start 2P', ui-monospace, monospace;
+    --font-pixel-sm: 'Pixelify Sans', ui-monospace, monospace;
+    --font-read: ui-serif, 'Iowan Old Style', 'Palatino Linotype', Georgia, 'Times New Roman', serif;
 }
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
@@ -22,15 +70,332 @@
 @source '../**/*.blade.php';
 @source '../**/*.js';
 
-@theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+@layer base {
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+        border-color: var(--line);
+    }
+
+    html {
+        scroll-behavior: smooth;
+        -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+        background: var(--paper);
+        color: var(--ink);
+        font-family: var(--font-sans);
+        -webkit-font-smoothing: antialiased;
+    }
+
+    button:not(:disabled),
+    [role='button']:not(:disabled),
+    summary {
+        cursor: pointer;
+    }
+
+    :focus-visible {
+        outline: 3px solid var(--brand);
+        outline-offset: 2px;
+        border-radius: 0.5rem;
+    }
+
+    ::selection {
+        background: var(--accent);
+        color: var(--on-accent);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        html {
+            scroll-behavior: auto;
+        }
+
+        *,
+        ::before,
+        ::after {
+            animation-duration: 0.01ms !important;
+            transition-duration: 0.01ms !important;
+        }
+    }
 }
 
+@layer components {
+    /* Buttons */
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        border-radius: 9999px;
+        padding: 0.6rem 1.25rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+        line-height: 1.25;
+        border: 1px solid transparent;
+        transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+    }
 
-.rubik-spray-paint-regular {
-    font-family: "Rubik Spray Paint", system-ui;
-    font-weight: 400;
-    font-style: normal;
-  }
-  
+    .btn:hover {
+        transform: translateY(-1px);
+    }
+
+    .btn-primary {
+        background: var(--brand);
+        color: var(--on-brand);
+        box-shadow: 0 6px 18px color-mix(in srgb, var(--brand) 35%, transparent);
+    }
+
+    .btn-primary:hover {
+        box-shadow: 0 10px 26px color-mix(in srgb, var(--brand) 45%, transparent);
+    }
+
+    .btn-ghost {
+        background: var(--surface);
+        border-color: var(--line);
+        color: var(--ink);
+    }
+
+    .btn-ghost:hover {
+        border-color: var(--brand);
+        color: var(--brand);
+    }
+
+    .btn-danger {
+        background: var(--danger);
+        color: #fff;
+    }
+
+    .btn-accent {
+        background: var(--accent);
+        color: var(--on-accent);
+    }
+
+    /* Small "chips": categories, counts */
+    .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        border-radius: 9999px;
+        padding: 0.4rem 0.95rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        color: var(--ink-soft);
+        white-space: nowrap;
+        transition: all 0.15s ease;
+    }
+
+    .chip:hover {
+        border-color: var(--brand);
+        color: var(--brand);
+    }
+
+    .chip[aria-current='page'],
+    .chip.is-active {
+        background: var(--ink);
+        border-color: var(--ink);
+        color: var(--paper);
+    }
+
+    .chip .chip-count {
+        font-size: 0.7rem;
+        line-height: 1.1rem;
+        padding: 0 0.4rem;
+        border-radius: 9999px;
+        background: color-mix(in srgb, currentColor 14%, transparent);
+    }
+
+    /* Panels */
+    .panel {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 1.5rem;
+        box-shadow: var(--shadow);
+    }
+
+    .kicker {
+        font-family: var(--font-pixel-sm);
+        font-size: 0.95rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--cyan);
+    }
+
+    .pixel-title {
+        font-family: var(--font-pixel);
+        line-height: 1.5;
+    }
+
+    /* Form fields */
+    .field {
+        display: block;
+        width: 100%;
+        border-radius: 0.9rem;
+        border: 1px solid var(--line);
+        background: var(--surface);
+        color: var(--ink);
+        padding: 0.75rem 1rem;
+        font-size: 0.95rem;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .field::placeholder {
+        color: var(--ink-soft);
+        opacity: 0.8;
+    }
+
+    .field:focus {
+        outline: none;
+        border-color: var(--brand);
+        box-shadow: 0 0 0 4px color-mix(in srgb, var(--brand) 22%, transparent);
+    }
+
+    /* Cards in the list */
+    .story {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        border-radius: 1.5rem;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        box-shadow: var(--shadow);
+        transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    }
+
+    .story:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+        border-color: color-mix(in srgb, var(--brand) 45%, var(--line));
+    }
+
+    .story .stretched::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+    }
+
+    .story .above {
+        position: relative;
+        z-index: 2;
+    }
+
+    .story-image {
+        aspect-ratio: 16 / 10;
+        overflow: hidden;
+        background: var(--surface-2);
+    }
+
+    .story-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.6s ease;
+    }
+
+    .story:hover .story-image img {
+        transform: scale(1.05);
+    }
+
+    .badge {
+        display: inline-block;
+        border-radius: 9999px;
+        padding: 0.2rem 0.7rem;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        background: var(--brand-soft);
+        color: var(--brand);
+    }
+
+    .avatar {
+        display: inline-flex;
+        flex: none;
+        align-items: center;
+        justify-content: center;
+        width: 2rem;
+        height: 2rem;
+        border-radius: 9999px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #fff;
+        background: var(--avatar, #2446e0);
+    }
+
+    .avatar-lg {
+        width: 3.25rem;
+        height: 3.25rem;
+        font-size: 1.15rem;
+    }
+
+    /* The article text */
+    .read {
+        font-family: var(--font-read);
+        font-size: 1.2rem;
+        line-height: 1.85;
+        color: var(--ink);
+    }
+
+    .read p + p {
+        margin-top: 1.4rem;
+    }
+
+    .read p:first-child {
+        font-size: 1.35rem;
+        line-height: 1.7;
+    }
+
+    /* Reading progress */
+    .progress {
+        position: fixed;
+        inset: 0 0 auto 0;
+        z-index: 60;
+        height: 4px;
+        pointer-events: none;
+    }
+
+    .progress > span {
+        display: block;
+        height: 100%;
+        transform: scaleX(0);
+        transform-origin: 0 50%;
+        background: linear-gradient(90deg, var(--cyan), var(--brand), var(--accent));
+    }
+
+    /* The pixel logo */
+    .logo-mark {
+        display: inline-grid;
+        grid-template-columns: repeat(3, 0.5rem);
+        gap: 2px;
+    }
+
+    .logo-mark i {
+        width: 0.5rem;
+        height: 0.5rem;
+        background: var(--brand);
+        border-radius: 1px;
+    }
+
+    .logo-mark i:nth-child(2n) {
+        background: var(--accent);
+    }
+
+    .logo-mark i.off {
+        background: transparent;
+    }
+
+    /* Hero decoration made of pixels */
+    .pixel-bg {
+        background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
+        background-size: 28px 28px;
+        mask-image: radial-gradient(ellipse at 70% 0%, #000 0%, transparent 70%);
+        -webkit-mask-image: radial-gradient(ellipse at 70% 0%, #000 0%, transparent 70%);
+        opacity: 0.7;
+    }
+}

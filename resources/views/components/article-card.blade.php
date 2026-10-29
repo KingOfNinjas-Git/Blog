@@ -1,49 +1,50 @@
-@props(['article', 'eager' => false])
-{{-- One article in the list: picture, title, author and category, then like / comments / date and, for the author, edit and delete. --}}
-<article class="flex flex-col overflow-hidden rounded-2xl border border-blue-200 bg-blue-50 text-left shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl">
-    @if ($article->image)
-        <a href="{{ route('articles.show', $article) }}" tabindex="-1" aria-hidden="true">
-            @php $srcset = \App\Support\ArticleImage::srcset($article->image); @endphp
+@props(['article', 'eager' => false, 'liked' => false])
+{{-- One article in the list: picture, category, title, a short teaser, who wrote it, then likes, comments and (for the author) edit and delete. --}}
+@php
+    $srcset = \App\Support\ArticleImage::srcset($article->image);
+@endphp
+<article class="story">
+    <div class="story-image">
+        @if ($article->image)
             <img src="{{ $srcset ? asset('storage/'.\App\Support\ArticleImage::thumbPath($article->image)) : asset('storage/'.$article->image) }}"
-                 @if ($srcset) srcset="{{ $srcset }}" sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" @endif
+                 @if ($srcset) srcset="{{ $srcset }}" sizes="(min-width: 1152px) 360px, (min-width: 640px) 45vw, 100vw" @endif
                  alt="" width="1000" height="600" decoding="async"
-                 @if ($eager) fetchpriority="high" @else loading="lazy" @endif class="h-64 w-full object-cover">
-        </a>
-    @endif
+                 @if ($eager) fetchpriority="high" @else loading="lazy" @endif>
+        @else
+            <div class="flex h-full items-center justify-center bg-gradient-to-br from-brand-soft to-surface-2 pixel-title text-2xl text-brand" aria-hidden="true">&lt;/&gt;</div>
+        @endif
+    </div>
 
     <div class="flex flex-1 flex-col gap-3 p-5">
-        <div>
-            <a href="{{ route('articles.show', $article) }}" class="article-title silkscreen-bold text-2xl font-semibold transition hover:text-blue-600">{{ $article->title }}</a>
-            <p class="byauthor silkscreen-regular mt-2 text-sm text-gray-600">
-                by <a href="{{ route('articles.index', ['search' => '@'.$article->author->name]) }}" class="font-bold hover:underline">{{ $article->author->name }}</a>
-                | in <a href="{{ route('articles.index', ['category' => $article->category_id]) }}" class="font-bold hover:underline">{{ $article->category->name }}</a>
-            </p>
+        <div class="flex items-center justify-between gap-2">
+            <a href="{{ route('articles.index', ['category' => $article->category_id]) }}" class="badge above hover:underline">{{ $article->category->name }}</a>
+            <span class="text-xs font-medium text-ink-soft">{{ $article->readingMinutes() }} min read</span>
+        </div>
+
+        <h2 class="text-xl font-bold leading-snug tracking-tight">
+            <a href="{{ route('articles.show', $article) }}" class="stretched transition hover:text-brand">{{ $article->title }}</a>
+        </h2>
+        <p class="line-clamp-3 text-sm leading-6 text-ink-soft">{{ $article->excerpt() }}</p>
+
+        <div class="mt-auto flex items-center gap-2.5 pt-2 text-sm text-ink-soft">
+            <x-avatar :name="$article->author->name" />
+            <span class="min-w-0 truncate">
+                <a href="{{ route('articles.index', ['search' => '@'.$article->author->name]) }}" class="above font-semibold text-ink hover:text-brand">{{ $article->author->name }}</a>
+                <span aria-hidden="true">&middot;</span>
+                <time datetime="{{ $article->created_at->toDateString() }}">{{ $article->created_at->format('M j, Y') }}</time>
+            </span>
             @if ($article->reactions_count > 10)
-                <span class="mt-2 inline-block rounded-full bg-yellow-300 px-2 py-1 text-xs font-semibold text-yellow-800">Popular</span>
+                <span class="badge ml-auto !bg-accent !text-on-accent">Popular</span>
             @endif
         </div>
 
-        <div class="mt-auto flex flex-wrap items-center justify-between gap-3">
-            <div class="flex flex-wrap items-center gap-3 text-sm text-gray-600">
-                <form method="POST" action="{{ route('articles.like', $article) }}">
-                    @csrf
-                    <button type="submit" class="rounded-full bg-white px-3 py-1 font-semibold text-blue-700 shadow-sm transition hover:bg-blue-100">👍 Like</button>
-                </form>
-                <span>{{ $article->reactions_count }} {{ Str::plural('Like', $article->reactions_count) }}</span>
-                <span>{{ $article->comments_count }} 💬</span>
-                <span>{{ $article->created_at->diffForHumans() }}</span>
-            </div>
-
-            @if ($article->isWrittenBy(auth()->user()))
-                <div class="ml-auto flex items-center gap-1">
-                    <a href="{{ route('articles.edit', $article) }}" class="rounded-full p-2 text-lg transition hover:bg-yellow-100" aria-label="Edit this article">✏️</a>
-                    <form method="POST" action="{{ route('articles.destroy', $article) }}" onsubmit="return confirm('Are you sure you want to delete this article?')">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="rounded-full p-2 text-lg transition hover:bg-red-100" aria-label="Delete this article">🗑️</button>
-                    </form>
-                </div>
-            @endif
+        <div class="above flex items-center gap-2 border-t border-line pt-3">
+            <x-like-button :article="$article" :liked="$liked" />
+            <a href="{{ route('articles.show', $article) }}#comments" class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-sm font-semibold text-ink-soft transition hover:text-brand" aria-label="{{ $article->comments_count }} {{ Str::plural('comment', $article->comments_count) }}">
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12Z"/></svg>
+                <span aria-hidden="true">{{ $article->comments_count }}</span>
+            </a>
+            <x-owner-actions :article="$article" class="ml-auto" />
         </div>
     </div>
 </article>

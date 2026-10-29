@@ -3,8 +3,11 @@
 @section('title', 'Write an article | My Blog')
 
 @section('content')
-    <div class="mx-auto max-w-2xl rounded-3xl border border-blue-300 bg-white p-6 shadow-2xl shadow-blue-950/20 md:p-8">
-        <h1 class="press-start-2p-regular mb-6 text-xl font-bold text-cyan-600 sm:text-2xl">New Article</h1>
-        @include('articles._form')
+    <div class="mx-auto max-w-3xl px-4 py-10 sm:py-14">
+        <p class="kicker">Your turn</p>
+        <h1 class="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">Write an article</h1>
+        <div class="panel mt-8 p-6 sm:p-8">
+            @include('articles._form')
+        </div>
     </div>
 @endsection

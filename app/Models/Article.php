@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class Article extends Model
 {
@@ -25,6 +26,34 @@ class Article extends Model
 
                 return $q->where('title', 'like', '%'.$search.'%');
             });
+    }
+
+    /** The list's order: ?sort=newest (the default), popular (most likes) or discussed (most comments). Needs withCount(['reactions', 'comments']). */
+    public function scopeOrderedBy(Builder $query, ?string $sort): Builder
+    {
+        return match ($sort) {
+            'popular' => $query->orderByDesc('reactions_count')->orderByDesc('created_at')->orderByDesc('id'),
+            'discussed' => $query->orderByDesc('comments_count')->orderByDesc('created_at')->orderByDesc('id'),
+            default => $query->orderByDesc('created_at')->orderByDesc('id'),
+        };
+    }
+
+    /** About how many minutes the article takes to read (200 words a minute, at least one). */
+    public function readingMinutes(): int
+    {
+        return max(1, (int) ceil(str_word_count(strip_tags($this->content)) / 200));
+    }
+
+    /** A short plain-text teaser for the cards. */
+    public function excerpt(int $limit = 140): string
+    {
+        return Str::limit(trim(preg_replace('/\s+/', ' ', strip_tags($this->content))), $limit);
+    }
+
+    /** The text as paragraphs (a blank line starts a new one), so the page can show it as readable blocks. */
+    public function paragraphs(): array
+    {
+        return array_values(array_filter(array_map('trim', preg_split('/\R{2,}/', $this->content) ?: []), fn ($p) => $p !== ''));
     }
 
     /** The picture's width and height, read from the file, so a page can reserve the space before it loads. */

@@ -1,6 +1,6 @@
 @php
     $shareText = 'A blog built with Laravel: browse articles by category, search by title or author, like, comment and publish your own. A portfolio demo by Francisco Cavaco.';
-    $shareImage = url('/blog-share.jpg?v=1');
+    $shareImage = url('/blog-share.jpg?v=2');
 @endphp
 <meta name="description" content="{{ $shareText }}">
 <meta property="og:type" content="website">
