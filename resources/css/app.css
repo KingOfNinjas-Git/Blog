@@ -356,6 +356,78 @@
         line-height: 1.7;
     }
 
+    /* Formatting a writer can use: headings, lists, quotes, links and code */
+    .read h2,
+    .read h3 {
+        font-family: var(--font-sans);
+        font-weight: 800;
+        letter-spacing: -0.01em;
+        line-height: 1.25;
+        margin: 2.2rem 0 0.8rem;
+    }
+
+    .read h2 {
+        font-size: 1.7rem;
+    }
+
+    .read h3 {
+        font-size: 1.3rem;
+    }
+
+    .read > :first-child {
+        margin-top: 0;
+    }
+
+    .read ul,
+    .read ol {
+        margin-top: 1.2rem;
+        padding-left: 1.6rem;
+    }
+
+    .read ul {
+        list-style: disc;
+    }
+
+    .read ol {
+        list-style: decimal;
+    }
+
+    .read li + li {
+        margin-top: 0.4rem;
+    }
+
+    .read li::marker {
+        color: var(--brand);
+    }
+
+    .read blockquote {
+        margin: 1.6rem 0;
+        padding: 0.4rem 0 0.4rem 1.2rem;
+        border-left: 4px solid var(--brand);
+        color: var(--ink-soft);
+        font-style: italic;
+    }
+
+    .read a {
+        color: var(--brand);
+        text-decoration: underline;
+        text-underline-offset: 3px;
+    }
+
+    .read code {
+        padding: 0.1rem 0.4rem;
+        border-radius: 0.4rem;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 0.85em;
+        background: var(--brand-soft);
+    }
+
+    .read hr {
+        margin: 2.2rem 0;
+        border: 0;
+        border-top: 1px solid var(--line);
+    }
+
     /* Reading progress */
     .progress {
         position: fixed;

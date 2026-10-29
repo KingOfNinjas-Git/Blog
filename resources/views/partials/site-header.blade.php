@@ -31,6 +31,7 @@
                     </summary>
                     <div class="absolute right-0 mt-2 w-56 overflow-hidden rounded-2xl border border-line bg-surface p-1.5 shadow-lg">
                         <p class="truncate px-3 py-2 text-sm font-semibold">{{ Auth::user()->name }}</p>
+                        <a href="{{ route('authors.show', Auth::id()) }}" class="block rounded-xl px-3 py-2 text-sm hover:bg-surface-2">My articles</a>
                         <a href="{{ route('profile.edit') }}" class="block rounded-xl px-3 py-2 text-sm hover:bg-surface-2">Profile</a>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf

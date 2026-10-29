@@ -12,7 +12,7 @@ class Article extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title', 'content', 'author_id', 'category_id', 'image', 'image_alt'];
+    protected $fillable = ['title', 'content', 'author_id', 'category_id', 'image', 'image_alt', 'status'];
 
     /** The list page's filters: ?category=<id> and ?search=<words in the title>, or ?search=@<author name>. */
     public function scopeFilter(Builder $query, array $filters): Builder
@@ -44,16 +44,39 @@ class Article extends Model
         return max(1, (int) ceil(str_word_count(strip_tags($this->content)) / 200));
     }
 
-    /** A short plain-text teaser for the cards. */
+    /** A short plain-text teaser for the cards (the formatting marks are left out). */
     public function excerpt(int $limit = 140): string
     {
-        return Str::limit(trim(preg_replace('/\s+/', ' ', strip_tags($this->content))), $limit);
+        $text = html_entity_decode(strip_tags($this->html()), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+        return Str::limit(trim(preg_replace('/\s+/', ' ', $text)), $limit);
     }
 
-    /** The text as paragraphs (a blank line starts a new one), so the page can show it as readable blocks. */
-    public function paragraphs(): array
+    /**
+     * The text as safe HTML. Writers can use simple formatting (## headings, **bold**, *italic*, lists, > quotes, [links](https://...));
+     * HTML typed into the text is removed, a blank line starts a new paragraph and a single new line becomes a line break.
+     */
+    public function html(): string
     {
-        return array_values(array_filter(array_map('trim', preg_split('/\R{2,}/', $this->content) ?: []), fn ($p) => $p !== ''));
+        $html = Str::markdown((string) $this->content, [
+            'html_input' => 'strip',
+            'allow_unsafe_links' => false,
+            'renderer' => ['soft_break' => "<br />\n"],
+        ]);
+
+        // Links to other sites open in a new tab without handing them the page
+        return preg_replace('/<a href="(https?:\/\/[^"]+)"/', '<a href="$1" target="_blank" rel="noopener noreferrer"', $html);
+    }
+
+    /** Only these can be seen by everyone; a draft is private to its author. */
+    public function scopePublished(Builder $query): Builder
+    {
+        return $query->where('status', 'published');
+    }
+
+    public function isDraft(): bool
+    {
+        return $this->status === 'draft';
     }
 
     /** The picture's width and height, read from the file, so a page can reserve the space before it loads. */

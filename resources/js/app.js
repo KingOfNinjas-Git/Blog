@@ -123,6 +123,43 @@ function initForms() {
             figure?.classList.remove('hidden');
         });
     });
+
+    // "Preview": shows the text with its formatting applied (the server turns it into safe HTML)
+    const toggle = $('#preview-toggle');
+    const box = $('#preview-box');
+    const field = $('#content');
+    if (toggle && box && field) {
+        toggle.hidden = false;
+        toggle.addEventListener('click', async () => {
+            if (toggle.getAttribute('aria-expanded') === 'true') {
+                box.hidden = true;
+                toggle.setAttribute('aria-expanded', 'false');
+                toggle.textContent = 'Preview';
+                return;
+            }
+
+            try {
+                const response = await fetch(toggle.dataset.previewUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Accept: 'application/json',
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]')?.content ?? '',
+                    },
+                    body: JSON.stringify({ content: field.value }),
+                });
+                if (!response.ok) throw new Error(String(response.status));
+                const data = await response.json();
+                box.innerHTML = data.html || '<p>Nothing to show yet.</p>';
+            } catch (error) {
+                box.textContent = 'The preview could not be loaded. Try again.';
+            }
+
+            box.hidden = false;
+            toggle.setAttribute('aria-expanded', 'true');
+            toggle.textContent = 'Hide preview';
+        });
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {

@@ -29,6 +29,12 @@
             </ol>
         </nav>
 
+        @if ($article->isDraft())
+            <p role="status" class="mx-auto mb-6 max-w-3xl rounded-2xl bg-accent px-5 py-3 text-sm font-bold text-on-accent">
+                Draft: only you can see this article. <a href="{{ route('articles.edit', $article) }}" class="underline underline-offset-2">Edit it</a> and press Publish when it is ready.
+            </p>
+        @endif
+
         <header class="mx-auto max-w-3xl">
             <a href="{{ route('articles.index', ['category' => $article->category_id]) }}" class="badge hover:underline">{{ $article->category->name }}</a>
             <h1 class="mt-4 text-3xl font-extrabold leading-[1.12] tracking-tight sm:text-5xl">{{ $article->title }}</h1>
@@ -36,7 +42,7 @@
             <div class="mt-6 flex flex-wrap items-center gap-x-4 gap-y-3">
                 <x-avatar :name="$article->author->name" size="lg" />
                 <div class="text-sm leading-6">
-                    <a href="{{ route('articles.index', ['search' => '@'.$article->author->name]) }}" class="font-bold hover:text-brand">{{ $article->author->name }}</a>
+                    <a href="{{ route('authors.show', $article->author_id) }}" class="font-bold hover:text-brand">{{ $article->author->name }}</a>
                     <p class="text-ink-soft">
                         <time datetime="{{ $article->created_at->toDateString() }}">{{ $article->created_at->format('F j, Y') }}</time>
                         &middot; {{ $article->readingMinutes() }} min read
@@ -67,11 +73,7 @@
         </div>
 
         {{-- The text --}}
-        <div class="mx-auto mt-10 max-w-3xl"><div class="read max-w-[40rem]" data-prose>
-            @foreach ($article->paragraphs() as $paragraph)
-                <p>{!! nl2br(e($paragraph)) !!}</p>
-            @endforeach
-        </div></div>
+        <div class="mx-auto mt-10 max-w-3xl"><div class="read max-w-[40rem]" data-prose>{!! $article->html() !!}</div></div>
 
         @if ($article->isWrittenBy(auth()->user()))
             <div class="mx-auto mt-10 flex max-w-3xl flex-wrap gap-3">
@@ -90,7 +92,7 @@
             <div class="min-w-0">
                 <p class="kicker !text-xs">Written by</p>
                 <p class="text-lg font-bold">{{ $article->author->name }}</p>
-                <a href="{{ route('articles.index', ['search' => '@'.$article->author->name]) }}" class="text-sm font-semibold text-brand underline underline-offset-2">More from {{ $article->author->name }}</a>
+                <a href="{{ route('authors.show', $article->author_id) }}" class="text-sm font-semibold text-brand underline underline-offset-2">More from {{ $article->author->name }}</a>
             </div>
         </aside>
 
@@ -108,6 +110,13 @@
                             <p class="flex flex-wrap items-baseline gap-x-3 text-sm">
                                 <span class="font-bold">{{ $comment->user->name }}</span>
                                 <time datetime="{{ $comment->created_at->toIso8601String() }}" class="text-ink-soft">{{ $comment->created_at->diffForHumans() }}</time>
+                                @if (auth()->id() === $comment->user_id || $article->isWrittenBy(auth()->user()))
+                                    <form method="POST" action="{{ route('comments.destroy', $comment) }}" class="ml-auto" onsubmit="return confirm('Remove this comment?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="rounded-full px-2.5 py-1 text-xs font-semibold text-ink-soft transition hover:bg-danger-soft hover:text-danger" aria-label="Remove the comment by {{ $comment->user->name }}">Remove</button>
+                                    </form>
+                                @endif
                             </p>
                             <p class="mt-1.5 whitespace-pre-line break-words leading-7 text-ink">{{ $comment->content }}</p>
                         </div>

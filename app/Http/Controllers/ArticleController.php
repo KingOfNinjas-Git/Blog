@@ -23,7 +23,8 @@ class ArticleController extends Controller
         $filters = $request->only('search', 'category');
         $sort = in_array($request->query('sort'), self::SORTS, true) ? $request->query('sort') : 'newest';
 
-        $articles = Article::with(['author', 'category'])
+        $articles = Article::published()
+            ->with(['author', 'category'])
             ->withCount(['reactions', 'comments'])
             ->filter($filters)
             ->orderedBy($sort)
@@ -35,7 +36,7 @@ class ArticleController extends Controller
         $featured = $plain && $articles->count() > 1 ? $articles->first() : null;
         $items = $featured ? $articles->getCollection()->slice(1)->values() : $articles->getCollection();
         $trending = $plain
-            ? Article::with(['author', 'category'])->withCount('reactions')->has('reactions')
+            ? Article::published()->with(['author', 'category'])->withCount('reactions')->has('reactions')
                 ->orderByDesc('reactions_count')->orderByDesc('created_at')->limit(3)->get()
             : collect();
 
@@ -44,20 +45,23 @@ class ArticleController extends Controller
             'items' => $items,
             'featured' => $featured,
             'trending' => $trending,
-            'categories' => Category::withCount('articles')->get(),
+            'categories' => Category::withCount(['articles' => fn ($query) => $query->published()])->get(),
             'filters' => $filters,
             'sort' => $sort,
-            'stats' => ['articles' => Article::count(), 'writers' => Author::count(), 'likes' => Reaction::count()],
+            'stats' => ['articles' => Article::published()->count(), 'writers' => Author::count(), 'likes' => Reaction::count()],
             'likedIds' => $this->likedIds(),
         ]);
     }
 
     public function show(Article $article): View
     {
+        // A draft is private: only the person who wrote it can open it
+        abort_if($article->isDraft() && ! $article->isWrittenBy(Auth::user()), 404);
+
         $article->load(['author', 'category', 'comments.user'])->loadCount(['reactions', 'comments']);
 
         // Up to three more, the ones from the same category first
-        $related = Article::with(['author', 'category'])->withCount(['reactions', 'comments'])
+        $related = Article::published()->with(['author', 'category'])->withCount(['reactions', 'comments'])
             ->whereKeyNot($article->id)->orderByRaw('category_id = ? desc', [$article->category_id])->latest()->limit(3)->get();
 
         return view('articles.show', [
@@ -84,9 +88,9 @@ class ArticleController extends Controller
         $data['author_id'] = Auth::id();
         $data['image'] = $request->hasFile('image') ? ArticleImage::store($request->file('image')) : null;
 
-        Article::create($data);
+        $article = Article::create($data);
 
-        return redirect()->route('articles.index')->with('success', 'Article created successfully!');
+        return $this->saved($article, 'Article created successfully!');
     }
 
     public function edit(Article $article): View
@@ -111,7 +115,7 @@ class ArticleController extends Controller
 
         $article->update($data);
 
-        return redirect()->route('articles.index')->with('success', 'Article updated successfully!');
+        return $this->saved($article, 'Article updated successfully!');
     }
 
     public function destroy(Article $article): RedirectResponse
@@ -122,6 +126,16 @@ class ArticleController extends Controller
         $article->delete();
 
         return redirect()->route('articles.index')->with('success', 'Article deleted successfully!');
+    }
+
+    /** A published article goes back to the list; a draft stays on its own page, where only its author can see it. */
+    private function saved(Article $article, string $message): RedirectResponse
+    {
+        if ($article->isDraft()) {
+            return redirect()->route('articles.show', $article)->with('success', 'Draft saved. Only you can see it until you publish it.');
+        }
+
+        return redirect()->route('articles.index')->with('success', $message);
     }
 
     private function mustBeTheAuthor(Article $article): void

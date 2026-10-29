@@ -56,7 +56,7 @@ class ArticleTest extends TestCase
         $this->assertSame(['Zelda review'], $titles('/articles?search=@Ana'));
         $this->get('/articles?search=nothing-like-this')->assertSee('No articles found.');
         $this->get('/categories/'.$games->id)->assertRedirect(route('articles.index', ['category' => $games->id]));
-        $this->get('/authors/'.$ana->id)->assertRedirect(route('articles.index', ['search' => '@Ana']));
+        $this->get('/authors/'.$ana->id)->assertOk()->assertSee('Zelda review')->assertDontSee('Football night');
     }
 
     public function test_an_article_page_shows_its_comments_and_a_missing_one_is_not_found(): void
@@ -252,11 +252,11 @@ class ArticleTest extends TestCase
 
         $this->assertSame(1, $article->readingMinutes());
         $this->assertSame(3, Article::make(['content' => str_repeat('word ', 450)])->readingMinutes());
-        $this->assertSame(['First paragraph.', "Second <b>paragraph</b>.\nSame paragraph, new line."], $article->paragraphs());
 
         $this->get(route('articles.show', $article))->assertOk()
             ->assertSee('<p>First paragraph.</p>', false)
-            ->assertSee('Second &lt;b&gt;paragraph&lt;/b&gt;.<br />', false) // text is escaped, a single new line becomes a line break
+            ->assertSee('Second paragraph.<br />', false) // typed HTML is removed, a single new line becomes a line break
+            ->assertDontSee('<b>', false)
             ->assertSee('1 min read')
             ->assertSee('Keep reading')->assertSee('Another one')
             ->assertSee('og:title" content="Long read"', false);
@@ -308,5 +308,108 @@ class ArticleTest extends TestCase
     public function test_the_fonts_come_from_this_site_not_from_google(): void
     {
         $this->get('/')->assertOk()->assertDontSee('fonts.googleapis.com')->assertDontSee('fonts.gstatic.com');
+    }
+
+    public function test_an_article_can_use_simple_formatting_but_never_html_or_unsafe_links(): void
+    {
+        $article = $this->article($this->writer(), ['content' => "## A heading\n\nSome **bold** and *italic* text with [a link](https://example.com) and [bad](javascript:alert(1)).\n\n- one\n- two\n\n<script>alert(1)</script>\n\n> a quote"]);
+
+        $html = $article->html();
+
+        $this->assertStringContainsString('<h2>A heading</h2>', $html);
+        $this->assertStringContainsString('<strong>bold</strong>', $html);
+        $this->assertStringContainsString('<em>italic</em>', $html);
+        $this->assertStringContainsString('<li>one</li>', $html);
+        $this->assertStringContainsString('<blockquote>', $html);
+        $this->assertStringContainsString('<a href="https://example.com" target="_blank" rel="noopener noreferrer">a link</a>', $html);
+        $this->assertStringNotContainsString('<script', $html);
+        $this->assertStringNotContainsString('javascript:', $html);
+        $this->assertStringNotContainsString('##', $article->excerpt()); // the teaser shows words, not formatting marks
+    }
+
+    public function test_a_writer_can_preview_the_formatting_but_a_guest_cannot(): void
+    {
+        $this->postJson('/articles/preview', ['content' => '**hi**'])->assertUnauthorized();
+
+        $this->actingAs($this->writer())->postJson('/articles/preview', ['content' => "**hi**\n\n<script>x</script>"])
+            ->assertOk()->assertJsonPath('html', fn (string $html) => str_contains($html, '<strong>hi</strong>') && ! str_contains($html, '<script'));
+    }
+
+    public function test_a_draft_is_private_to_its_writer_and_left_out_of_every_public_list(): void
+    {
+        $writer = $this->writer('Dana');
+        $other = $this->writer('Other');
+        $category = Category::create(['name' => 'GAMES']);
+        $public = $this->article($writer, ['title' => 'Out in the open', 'category_id' => $category->id]);
+        $draft = $this->article($writer, ['title' => 'Secret plans', 'category_id' => $category->id, 'status' => 'draft']);
+        $draft->reactions()->create(['user_id' => $other->id, 'type' => 'like']);
+
+        // saving as a draft keeps you on the article, saying so
+        $this->actingAs($writer)->post('/articles', ['title' => 'Fresh draft', 'content' => 'x', 'category_id' => $category->id, 'status' => 'draft'])
+            ->assertRedirect(route('articles.show', Article::firstWhere('title', 'Fresh draft')))->assertSessionHas('success');
+        $this->assertTrue(Article::firstWhere('title', 'Fresh draft')->isDraft());
+
+        // nobody else can open it, whether signed in or not
+        auth()->logout();
+        $this->get(route('articles.show', $draft))->assertNotFound();
+        $this->actingAs($other)->get(route('articles.show', $draft))->assertNotFound();
+        $this->actingAs($writer)->get(route('articles.show', $draft))->assertOk()->assertSee('only you can see this article');
+
+        // and it is not in the list, the trending strip, the counts or the writer's public page
+        auth()->logout();
+        $page = $this->get('/')->assertOk();
+        $page->assertSee('Out in the open')->assertDontSee('Secret plans')->assertDontSee('Fresh draft');
+        $this->assertCount(0, $page->viewData('trending'));
+        $this->assertSame(1, $page->viewData('categories')->first()->articles_count);
+        $this->assertSame(1, $page->viewData('stats')['articles']);
+        $this->get('/authors/'.$writer->id)->assertOk()->assertSee('Out in the open')->assertDontSee('Secret plans')->assertDontSee('Your drafts');
+        $this->assertCount(0, $this->get(route('articles.show', $public))->viewData('related'));
+
+        // the writer sees their own drafts on their page, can publish one, and then it is public
+        $this->actingAs($writer)->get('/authors/'.$writer->id)->assertSee('Your drafts')->assertSee('Secret plans');
+        $this->actingAs($writer)->put(route('articles.update', $draft), ['title' => 'Secret plans', 'content' => 'Some text', 'category_id' => $category->id, 'status' => 'published'])
+            ->assertRedirect(route('articles.index'));
+        auth()->logout();
+        $this->get('/')->assertSee('Secret plans');
+        $this->get(route('articles.show', $draft))->assertOk();
+
+        $this->actingAs($writer)->post('/articles', ['title' => 'Bad status', 'content' => 'x', 'category_id' => $category->id, 'status' => 'secret'])->assertSessionHasErrors('status');
+    }
+
+    public function test_the_author_page_counts_only_published_work(): void
+    {
+        $dana = $this->writer('Dana');
+        $reader = User::factory()->create();
+        $one = $this->article($dana, ['title' => 'First piece']);
+        $this->article($dana, ['title' => 'Hidden piece', 'status' => 'draft']);
+        $one->reactions()->create(['user_id' => $reader->id, 'type' => 'like']);
+        $one->comments()->create(['user_id' => $reader->id, 'content' => 'Nice']);
+
+        $this->get('/authors/'.$dana->id)->assertOk()->assertSee('Dana')->assertViewHas('stats', ['articles' => 1, 'likes' => 1, 'comments' => 1]);
+        $this->get('/authors/9999')->assertNotFound();
+    }
+
+    public function test_a_comment_can_be_removed_by_its_writer_or_by_the_article_s_writer_only(): void
+    {
+        $author = $this->writer('Author');
+        $article = $this->article($author);
+        $reader = User::factory()->create();
+        $stranger = User::factory()->create();
+        $mine = $article->comments()->create(['user_id' => $reader->id, 'content' => 'Mine']);
+        $other = $article->comments()->create(['user_id' => $stranger->id, 'content' => 'Theirs']);
+
+        $this->delete(route('comments.destroy', $mine))->assertRedirect('/login');
+        $this->actingAs($stranger)->delete(route('comments.destroy', $mine))->assertForbidden();
+        $this->assertSame(2, $article->comments()->count());
+
+        $this->actingAs($reader)->delete(route('comments.destroy', $mine))->assertRedirect()->assertSessionHas('success', 'Comment removed.');
+        $this->actingAs($author)->delete(route('comments.destroy', $other))->assertRedirect();
+        $this->assertSame(0, $article->comments()->count());
+
+        // the Remove button is only offered to people who may use it
+        $article->comments()->create(['user_id' => $reader->id, 'content' => 'Again']);
+        $this->actingAs($stranger)->get(route('articles.show', $article))->assertDontSee('Remove the comment by');
+        $this->actingAs($reader)->get(route('articles.show', $article))->assertSee('Remove the comment by');
+        $this->actingAs($author)->get(route('articles.show', $article))->assertSee('Remove the comment by');
     }
 }

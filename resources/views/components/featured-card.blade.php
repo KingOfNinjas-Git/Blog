@@ -29,7 +29,7 @@
         <div class="flex items-center gap-2.5 text-sm text-ink-soft">
             <x-avatar :name="$article->author->name" />
             <span>
-                <a href="{{ route('articles.index', ['search' => '@'.$article->author->name]) }}" class="above font-semibold text-ink hover:text-brand">{{ $article->author->name }}</a>
+                <a href="{{ route('authors.show', $article->author_id) }}" class="above font-semibold text-ink hover:text-brand">{{ $article->author->name }}</a>
                 <span aria-hidden="true">&middot;</span>
                 <time datetime="{{ $article->created_at->toDateString() }}">{{ $article->created_at->format('M j, Y') }}</time>
             </span>

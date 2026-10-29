@@ -19,7 +19,21 @@
     <div>
         <label for="content" class="mb-1.5 block text-sm font-bold">Content</label>
         <textarea id="content" name="content" rows="12" required placeholder="Write your story. A blank line starts a new paragraph." data-count="#content-stats" data-count-words class="field !font-[var(--font-read)] !text-lg !leading-8">{{ old('content', $article?->content) }}</textarea>
-        <p class="mt-1.5 text-xs text-ink-soft"><span id="content-stats">0 words</span></p>
+        <div class="mt-2 flex flex-wrap items-center justify-between gap-3">
+            <p class="text-xs text-ink-soft"><span id="content-stats">0 words</span></p>
+            <button type="button" id="preview-toggle" data-preview-url="{{ route('articles.preview') }}" hidden class="btn btn-ghost !px-4 !py-1.5 !text-xs" aria-expanded="false" aria-controls="preview-box">Preview</button>
+        </div>
+        <details class="mt-2 text-sm text-ink-soft">
+            <summary class="w-fit cursor-pointer font-semibold text-brand">Formatting help</summary>
+            <ul class="mt-2 list-inside list-disc space-y-1 leading-6">
+                <li><code>## A heading</code> and <code>### A smaller heading</code></li>
+                <li><code>**bold**</code> and <code>*italic*</code></li>
+                <li><code>- an item</code> for a list, <code>1. an item</code> for a numbered list</li>
+                <li><code>&gt; a quote</code></li>
+                <li><code>[link text](https://example.com)</code></li>
+            </ul>
+        </details>
+        <div id="preview-box" hidden class="read mt-3 rounded-2xl border border-line bg-surface-2 p-5" aria-live="polite"></div>
     </div>
 
     <div class="grid gap-6 sm:grid-cols-2">
@@ -50,7 +64,8 @@
     </div>
 
     <div class="flex flex-col gap-3 pt-2 sm:flex-row">
-        <button type="submit" class="btn btn-primary !py-3 sm:flex-1">{{ $article ? 'Save Changes' : 'Create Article' }}</button>
+        <button type="submit" name="status" value="published" class="btn btn-primary !py-3 sm:flex-1">{{ $article && ! $article->isDraft() ? 'Save Changes' : ($article ? 'Publish' : 'Create Article') }}</button>
+        <button type="submit" name="status" value="draft" class="btn btn-ghost !py-3 sm:flex-1">{{ $article && ! $article->isDraft() ? 'Move back to drafts' : 'Save as draft' }}</button>
         <a href="{{ $article ? route('articles.show', $article) : route('articles.index') }}" class="btn btn-ghost !py-3 sm:flex-1">Cancel</a>
     </div>
 </form>
